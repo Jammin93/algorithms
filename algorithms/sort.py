@@ -3,6 +3,23 @@ def insertion_sort(
         inplace: bool = False,
         reverse: bool = False,
         ) -> list | None:
+    """
+    Optimized insertion sort which operates in O(n^2) time. Only one swap is
+    performed per iteration of the outer loop. Until the inner loop exits,
+    values are merely pushed up or down the list, overwriting the values of
+    immediate neighbors. The target value from the outer loop is then
+    inserted once the inner loop exits, constituting a swap. Consider the
+    array [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]. Let `i` start at 5
+    and set `k` equal `i` - 1 at the start of the inner loop. The array
+    will be manipulated as follows.
+
+    [10, 9, 8, 7, 6, 6, 4, 3, 2, 1]  --->  `k` = 4
+    [10, 9, 8, 7, 7, 6, 4, 3, 2, 1]  --->  `k` = 3
+    [10, 9, 8, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = 2
+    [10, 9, 9, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = 1
+    [10, 10, 9, 8, 7, 6, 4, 3, 2, 1] --->  `k` = 0
+    [5, 10, 9, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = -1
+    """
     if not isinstance(arr, list):
         arr = list(arr)
 
@@ -67,6 +84,7 @@ def select_sort(
         inplace: bool = False,
         reverse: bool = False,
         ) -> list | None:
+    """Basic selection sort implementation which operates in O(n^2) time."""
     arrsize = len(arr)
     if inplace and not reverse:
         for i in range(arrsize):
@@ -109,6 +127,11 @@ def select_sort(
 
 
 def merge_sort(arr: list, reverse: bool = False):
+    """
+    Optimized top-down merge sort which operates in O(nlogn) time. Uses
+    optimized insertion sort for smaller lists in order to minimize pages
+    being swapped in and out of the memory cache.
+    """
     if len(arr) <= 16:
         # Use insertion sort for small lists, to maximize cache hits.
         if not reverse:
