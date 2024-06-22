@@ -132,7 +132,9 @@ def merge_sort(arr: list, reverse: bool = False):
     optimized insertion sort for smaller lists in order to minimize pages
     being swapped in and out of the memory cache.
     """
-    if len(arr) <= 16:
+    if len(arr) <= 1:
+        return arr
+    elif len(arr) <= 16:
         # Use insertion sort for small lists, to maximize cache hits.
         if not reverse:
             for i in range(1, len(arr)):
@@ -219,7 +221,9 @@ def quick_sort(arr: list, reverse: bool = False):
 
 
 def _quick_sort(arr: list, low: int, high: int):
-    if high - low <= 32 and low < high:
+    if low - high <= 1:
+        return
+    elif high - low <= 32 and low < high:
         for i in range(1, len(arr)):
             current = arr[i]
             swap_idx = i - 1
