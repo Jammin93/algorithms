@@ -174,7 +174,7 @@ def merge_sort(arr: list, reverse: bool = False):
 
 
 def _merge(left: list, right: list, reverse: bool):
-    # Merge the left and right halve of the array into a single, sorted array.
+    # Merge the left and right halves of the array into a single, sorted array.
     merged = []
     left_index = 0
     right_index = 0
