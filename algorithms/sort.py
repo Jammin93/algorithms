@@ -212,3 +212,42 @@ def _merge(left: list, right: list, reverse: bool):
     # We should always end up with one empty and one non-empty array.
     merged.extend(right[right_index:] or left[left_index:])
     return merged
+
+
+def quick_sort(arr: list, reverse: bool = False):
+    _quick_sort(arr, 0, len(arr) - 1)
+
+
+def _quick_sort(arr: list, low: int, high: int):
+    if high - low <= 32 and low < high:
+        for i in range(1, len(arr)):
+            current = arr[i]
+            swap_idx = i - 1
+            for k in range(swap_idx, -2, -1):
+                swap_idx = k
+                if arr[k] > current:
+                    arr[k + 1] = arr[k]
+                else:
+                    break
+
+            arr[swap_idx + 1] = current
+    elif low < high:
+        mid = (high + low) // 2
+        pivot = high
+        if arr[low] < arr[mid] < arr[high]:
+            pivot = mid
+        elif arr[low] < arr[high]:
+            pivot = low
+
+        pivot_value = arr[pivot]
+        arr[pivot], arr[low] = arr[low], arr[pivot]
+        border = low
+        for i in range(low, high + 1):
+            if (target := arr[i]) < pivot_value:
+                border += 1
+                arr[i], arr[border] = arr[border], target
+
+        arr[low], arr[border] = arr[border], arr[low]
+
+        _quick_sort(arr, low, border - 1)
+        _quick_sort(arr, border + 1, high)
