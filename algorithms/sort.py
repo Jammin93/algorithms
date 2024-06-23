@@ -1,3 +1,6 @@
+import random
+
+
 def insertion_sort(
         arr: list,
         inplace: bool = False,
@@ -221,9 +224,7 @@ def quick_sort(arr: list, reverse: bool = False):
 
 
 def _quick_sort(arr: list, low: int, high: int):
-    if high - low <= 1:
-        return
-    elif low < high:
+    if low < high:
         if high - low <= 32:
             for i in range(1, len(arr)):
                 current = arr[i]
@@ -237,22 +238,31 @@ def _quick_sort(arr: list, low: int, high: int):
 
                 arr[swap_idx + 1] = current
         else:
-            mid = (high + low) // 2
-            pivot = high
-            if arr[low] < arr[mid] < arr[high]:
-                pivot = mid
-            elif arr[low] < arr[high]:
-                pivot = low
+            # After testing, this appears to be the best way to select the
+            # pivot.
+            if high - low <= 54:
+                pivot = random.randint(low, high)
+            else:
+                pivot = (high + low) // 2
+                if arr[low] < arr[high]:
+                    if arr[high] < arr[pivot]:
+                        pivot = high
+                elif arr[low] < arr[pivot]:
+                    pivot = low
 
             pivot_value = arr[pivot]
-            arr[pivot], arr[low] = arr[low], arr[pivot]
-            border = low
-            for i in range(low, high + 1):
-                if (target := arr[i]) < pivot_value:
-                    border += 1
-                    arr[i], arr[border] = arr[border], target
+            i = low
+            k = high
+            while i <= k:
+                while arr[i] < pivot_value:
+                    i += 1
+                while arr[k] > pivot_value:
+                    k -= 1
 
-            arr[low], arr[border] = arr[border], arr[low]
+                if i <= k:
+                    arr[i], arr[k] = arr[k], arr[i]
+                    i += 1
+                    k -= 1
 
-            _quick_sort(arr, low, border - 1)
-            _quick_sort(arr, border + 1, high)
+            _quick_sort(arr, low, k)
+            _quick_sort(arr, i, high)
