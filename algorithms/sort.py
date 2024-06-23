@@ -219,7 +219,7 @@ def _merge(left: list, right: list, reverse: bool):
     return merged
 
 
-def quick_sort(arr: list, reverse: bool = False):
+def quick_sort(arr: list):
     _quick_sort(arr, 0, len(arr) - 1)
 
 
