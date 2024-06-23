@@ -225,8 +225,10 @@ def quick_sort(arr: list, reverse: bool = False):
 
 def _quick_sort(arr: list, low: int, high: int):
     if low < high:
-        if high - low <= 32:
-            for i in range(1, len(arr)):
+        if high - low <= 10:
+            # Modified insertion sort which maximizes cache hits and operates
+            # closer to O(n) for smaller lists.
+            for i in range(low + 1, high + 1):
                 current = arr[i]
                 swap_idx = i - 1
                 for k in range(swap_idx, -2, -1):
