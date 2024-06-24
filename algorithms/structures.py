@@ -1,10 +1,11 @@
-from math import ceil, log2
+import algorithms.sort as srt
+
+from abc import ABCMeta, abstractmethod
+from math import log2
 from typing import Optional
 
-from algorithms.sort import _quick_sort
 
-
-class MaxHeap:
+class _Heap(metaclass=ABCMeta):
 
     def __init__(self, values: Optional[list] = None):
         if values is None:
@@ -12,6 +13,44 @@ class MaxHeap:
 
         self._items = values
         self.heapify()
+
+    @abstractmethod
+    def heapify(self):
+        ...
+
+    @abstractmethod
+    def push(self, value) -> None:
+        ...
+
+    @abstractmethod
+    def pop(self):
+        ...
+
+    @abstractmethod
+    def _sift_up(self, index: int) -> None:
+        ...
+
+    @abstractmethod
+    def _sift_down(self, index: int, upper: Optional[int] = None) -> None:
+        ...
+
+    def __len__(self):
+        return len(self._items)
+
+    def __str__(self):
+        return self._items.__str__()
+
+    def __iter__(self):
+        return self._items.__iter__()
+
+    def __getitem__(self, item):
+        return self._items.__getitem__(item)
+
+
+class MaxHeap(_Heap):
+
+    def __init__(self, values: Optional[list] = None):
+        super().__init__(values)
 
     @property
     def largest(self):
@@ -135,8 +174,6 @@ class MaxHeap:
             else:
                 break
 
-    def __len__(self):
-        return len(self._items)
 
-    def __str__(self):
-        return self._items.__str__()
+class MinHeap(_Heap):
+    pass
