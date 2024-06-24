@@ -1,4 +1,4 @@
-from math import log2
+from math import ceil, log2
 from typing import Optional
 
 from algorithms.sort import _quick_sort
@@ -17,10 +17,60 @@ class MaxHeap:
     def largest(self):
         return self._items[0]
 
-    def nth_largest(self, n: int):
-        raise NotImplementedError
+    def nth_largest(self, n: int, allow_dupes: bool = False):
+        if n > len(self._items):
+            return None
 
-    def heapify(self):
+        if n == 1:
+            return self._items[0]
+
+        if allow_dupes:
+            if n <= 50_000:
+                keep = []
+                value = self.pop()
+                keep.append(value)
+                for _ in range(1, n):
+                    value = self.pop()
+                    keep.append(value)
+
+                for v in keep:
+                    self.push(v)
+            else:
+                lst = sorted(self._items, reverse=True)
+                value = lst[n - 1]
+        else:
+            if n <= 50_000:
+                k = 1
+                i = 0
+                value = self._items[0]
+                keep = []
+                while k < n:
+                    if i > len(self._items) - 1:
+                        return None
+
+                    v = self.pop()
+                    if v < value:
+                        value = v
+                        k += 1
+
+                    keep.append(v)
+                    i += 1
+
+                for v in keep:
+                    self.push(v)
+
+                return value
+            else:
+                lst = list(set(self._items))
+                if n > len(lst):
+                    return None
+
+                lst.sort(reverse=True)
+                value = lst[n - 1]
+
+        return value
+
+    def heapify(self) -> None:
         # See https://tinyurl.com/34m7tun3 for why this is optimal.
         start = (len(self._items) - 2) // 2 # The last parent
         for i in range(start, -1, -1):
@@ -40,7 +90,6 @@ class MaxHeap:
             value = self._items.pop()
             self._sift_down(0)
         elif len(self._items) == 2:
-            # self._items[0], self._items[1] = self._items[1], self._items[0]
             value = self._items.pop(0)
         else:
             value = self._items.pop()
@@ -60,10 +109,7 @@ class MaxHeap:
             for lvl in range(levels + 1):
                 n = 2 ** lvl
                 idx = n - 1
-                end = idx + n
-                if end > (e := len(self._items) - 1):
-                    end = e
-
+                end = min(len(self._items) - 1, idx + n)
                 _quick_sort(self._items, idx, end, reverse=True)
 
     def _sift_up(self, index: int) -> None:
@@ -104,3 +150,9 @@ class MaxHeap:
             # If we don't have any children then we can't perform a swap.
             else:
                 break
+
+    def __len__(self):
+        return len(self._items)
+
+    def __str__(self):
+        return self._items.__str__()
