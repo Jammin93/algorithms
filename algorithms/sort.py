@@ -219,26 +219,39 @@ def _merge(left: list, right: list, reverse: bool):
     return merged
 
 
-def quick_sort(arr: list):
-    _quick_sort(arr, 0, len(arr) - 1)
+def quick_sort(arr: list, reverse: bool = False):
+    _quick_sort(arr, 0, len(arr) - 1, reverse=reverse)
 
 
-def _quick_sort(arr: list, low: int, high: int):
+def _quick_sort(arr: list, low: int, high: int, reverse: bool = False):
     if low < high:
         if high - low <= 10:
-            # Modified insertion sort which maximizes cache hits and operates
-            # closer to O(n) for smaller lists.
-            for i in range(low + 1, high + 1):
-                current = arr[i]
-                swap_idx = i - 1
-                for k in range(swap_idx, -2, -1):
-                    swap_idx = k
-                    if arr[k] > current:
-                        arr[k + 1] = arr[k]
-                    else:
-                        break
+            if not reverse:
+                # Modified insertion sort which maximizes cache hits and
+                # operates closer to O(n) for smaller lists.
+                for i in range(low + 1, high + 1):
+                    current = arr[i]
+                    swap_idx = i - 1
+                    for k in range(swap_idx, -2, -1):
+                        swap_idx = k
+                        if arr[k] > current:
+                            arr[k + 1] = arr[k]
+                        else:
+                            break
 
-                arr[swap_idx + 1] = current
+                    arr[swap_idx + 1] = current
+            else:
+                for i in range(low + 1, high + 1):
+                    current = arr[i]
+                    swap_idx = i - 1
+                    for k in range(swap_idx, -2, -1):
+                        swap_idx = k
+                        if arr[k] < current:
+                            arr[k + 1] = arr[k]
+                        else:
+                            break
+
+                    arr[swap_idx + 1] = current
         else:
             # After testing, this appears to be the best way to select the
             # pivot.
@@ -253,18 +266,19 @@ def _quick_sort(arr: list, low: int, high: int):
                     pivot = low
 
             pivot_value = arr[pivot]
-            i = low
-            k = high
-            while i <= k:
-                while arr[i] < pivot_value:
-                    i += 1
-                while arr[k] > pivot_value:
-                    k -= 1
+            arr[pivot], arr[low] = arr[low], arr[pivot]
+            border = low
+            if not reverse:
+                for i in range(low, high + 1):
+                    if arr[i] < pivot_value:
+                        border += 1
+                        arr[i], arr[border] = arr[border], arr[i]
+            else:
+                for i in range(low, high + 1):
+                    if arr[i] > pivot_value:
+                        border += 1
+                        arr[i], arr[border] = arr[border], arr[i]
 
-                if i <= k:
-                    arr[i], arr[k] = arr[k], arr[i]
-                    i += 1
-                    k -= 1
-
-            _quick_sort(arr, low, k)
-            _quick_sort(arr, i, high)
+            arr[low], arr[border] = arr[border], arr[low]
+            _quick_sort(arr, low, border - 1, reverse=reverse)
+            _quick_sort(arr, border + 1, high, reverse=reverse)
