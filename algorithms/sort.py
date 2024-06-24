@@ -1,9 +1,11 @@
 import random
 
+import algorithms.structures as structs
+
 
 def insertion_sort(
         arr: list,
-        inplace: bool = False,
+        inplace: bool = True,
         reverse: bool = False,
         ) -> list | None:
     """
@@ -84,7 +86,7 @@ def insertion_sort(
 
 def select_sort(
         arr: list,
-        inplace: bool = False,
+        inplace: bool = True,
         reverse: bool = False,
         ) -> list | None:
     """Basic selection sort implementation which operates in O(n^2) time."""
@@ -282,3 +284,12 @@ def _quick_sort(arr: list, low: int, high: int, reverse: bool = False):
             arr[low], arr[border] = arr[border], arr[low]
             _quick_sort(arr, low, border - 1, reverse=reverse)
             _quick_sort(arr, border + 1, high, reverse=reverse)
+
+
+def heap_sort(arr: list, reverse: bool = False):
+    if not reverse:
+        heap = structs.MaxHeap(arr)
+        values = heap._items
+        for upper in range(len(heap) - 1, 0, -1):
+            values[0], values[upper] = values[upper], values[0]
+            heap._sift_down(0, upper - 1)
