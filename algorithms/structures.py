@@ -96,22 +96,6 @@ class MaxHeap:
 
         return value
 
-    def sort(self, reverse: bool = False):
-        if not reverse:
-            for upper in range(len(self._items) - 1, 0, -1):
-                self._items[0], self._items[upper] = (
-                    self._items[upper],
-                    self._items[0]
-                )
-                self._sift_down(0, upper - 1)
-        else:
-            levels = int(log2(len(self._items)))
-            for lvl in range(levels + 1):
-                n = 2 ** lvl
-                idx = n - 1
-                end = min(len(self._items) - 1, idx + n)
-                _quick_sort(self._items, idx, end, reverse=True)
-
     def _sift_up(self, index: int) -> None:
         parent = (index - 1) // 2
         items = self._items
