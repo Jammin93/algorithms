@@ -3,6 +3,10 @@ import random
 import algorithms.structures as structs
 
 # todo: add thin wrappers to allow non-inplace sorting.
+# todo: add shell sort and possible replace insertion sort logic in quick
+#  sort and merge sort with shell sort. This needs to be tested but should
+#  may be more efficient. It's unclear whether it will be more efficient for
+#  small lists like those encountered in merge and quick sort.
 
 
 def insertion_sort(
