@@ -175,5 +175,46 @@ class MaxHeap(_Heap):
                 break
 
 
-class MinHeap(_Heap):
-    pass
+class MinHeap(MaxHeap):
+
+    def __init__(self, values: Optional[list] = None):
+        super().__init__(values)
+
+    def _sift_up(self, index: int) -> None:
+        parent = (index - 1) // 2
+        items = self._items
+        while index > 0 and items[index] < items[parent]:
+            items[index], items[parent] = items[parent], items[index]
+            index = parent
+            parent = (index - 1) // 2
+
+    def _sift_down(self, index: int, upper: Optional[int] = None) -> None:
+        if upper is None:
+            upper = len(self._items) - 1
+
+        items = self._items
+        while True:
+            left = index * 2 + 1
+            right = index * 2 + 2
+            # Determine whether we have two children.
+            if right <= upper:
+                if items[left] <= items[right]:
+                    mn = left
+                else:
+                    mn = right
+
+                if items[index] <= items[mn]:
+                    break
+
+                items[index], items[mn] = items[mn], items[index]
+                index = mn
+            # If we don't have two children, check to see if we have one child.
+            elif left <= upper:
+                if items[index] <= items[left]:
+                    break
+
+                items[index], items[left] = items[left], items[index]
+                index = left
+            # If we don't have any children then we can't perform a swap.
+            else:
+                break
