@@ -289,7 +289,10 @@ def _quick_sort(arr: list, low: int, high: int, reverse: bool = False):
 def heap_sort(arr: list, reverse: bool = False):
     if not reverse:
         heap = structs.MaxHeap(arr)
-        values = heap._items
-        for upper in range(len(heap) - 1, 0, -1):
-            values[0], values[upper] = values[upper], values[0]
-            heap._sift_down(0, upper - 1)
+    else:
+        heap = structs.MinHeap(arr)
+
+    values = heap._items
+    for upper in range(len(heap) - 1, 0, -1):
+        values[0], values[upper] = values[upper], values[0]
+        heap._sift_down(0, upper - 1)
