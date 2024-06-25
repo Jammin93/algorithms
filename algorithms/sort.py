@@ -2,10 +2,11 @@ import random
 
 import algorithms.structures as structs
 
+# todo: add thin wrappers to allow non-inplace sorting.
+
 
 def insertion_sort(
         arr: list,
-        inplace: bool = True,
         reverse: bool = False,
         ) -> list | None:
     """
@@ -25,10 +26,7 @@ def insertion_sort(
     [10, 10, 9, 8, 7, 6, 4, 3, 2, 1] --->  `k` = 0
     [5, 10, 9, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = -1
     """
-    if not isinstance(arr, list):
-        arr = list(arr)
-
-    if inplace and not reverse:
+    if not reverse:
         for i in range(1, len(arr)):
             current = arr[i]
             swap_idx = i - 1
@@ -40,7 +38,7 @@ def insertion_sort(
                     break
 
             arr[swap_idx + 1] = current
-    elif inplace and reverse:
+    else:
         for i in range(1, len(arr)):
             current = arr[i]
             swap_idx = i - 1
@@ -52,46 +50,15 @@ def insertion_sort(
                     break
 
             arr[swap_idx + 1] = current
-    elif not inplace and not reverse:
-        new_arr = arr.copy()
-        for i in range(1, len(new_arr)):
-            current = new_arr[i]
-            swap_idx = i - 1
-            for k in range(i - 1, -2, -1):
-                swap_idx = k
-                if new_arr[k] > current:
-                    new_arr[k + 1] = new_arr[k]
-                else:
-                    break
-
-            new_arr[swap_idx + 1] = current
-
-        return new_arr
-    else:
-        new_arr = arr.copy()
-        for i in range(1, len(new_arr)):
-            current = new_arr[i]
-            swap_idx = i - 1
-            for k in range(i - 1, -2, -1):
-                swap_idx = k
-                if new_arr[k] < current:
-                    new_arr[k + 1] = new_arr[k]
-                else:
-                    break
-
-            new_arr[swap_idx + 1] = current
-
-        return new_arr
 
 
 def select_sort(
         arr: list,
-        inplace: bool = True,
         reverse: bool = False,
         ) -> list | None:
     """Basic selection sort implementation which operates in O(n^2) time."""
     arrsize = len(arr)
-    if inplace and not reverse:
+    if not reverse:
         for i in range(arrsize):
             min_index = i
             for k in range(i + 1, arrsize):
@@ -99,7 +66,7 @@ def select_sort(
                     min_index = k
 
             arr[i], arr[min_index] = arr[min_index], arr[i]
-    elif inplace and reverse:
+    else:
         for i in range(arrsize):
             max_index = i
             for k in range(i + 1, arrsize):
@@ -107,28 +74,6 @@ def select_sort(
                     max_index = k
 
             arr[i], arr[max_index] = arr[max_index], arr[i]
-    elif not inplace and not reverse:
-        new_arr = arr.copy()
-        for i in range(arrsize):
-            min_index = i
-            for k in range(i + 1, arrsize):
-                if new_arr[k] < new_arr[min_index]:
-                    min_index = k
-
-            new_arr[i], new_arr[min_index] = new_arr[min_index], new_arr[i]
-
-        return new_arr
-    else:
-        new_arr = arr.copy()
-        for i in range(arrsize):
-            max_index = i
-            for k in range(i + 1, arrsize):
-                if new_arr[k] > new_arr[max_index]:
-                    max_index = k
-
-            new_arr[i], new_arr[max_index] = new_arr[max_index], new_arr[i]
-
-        return new_arr
 
 
 def merge_sort(arr: list, reverse: bool = False):
@@ -296,3 +241,35 @@ def heap_sort(arr: list, reverse: bool = False):
     for upper in range(len(heap) - 1, 0, -1):
         values[0], values[upper] = values[upper], values[0]
         heap._sift_down(0, upper - 1)
+
+
+def comb_sort(arr: list, reverse: bool = False):
+    n = gap = len(arr)
+    swapped = True
+    if not reverse:
+        while gap != 1 or swapped is not False:
+            gap = max(1, int(gap // 1.3))
+            swapped = False
+            for i in range(n - gap):
+                ridx = i + gap
+                if (left := arr[i]) > (right := arr[ridx]):
+                    arr[i], arr[ridx] = right, left
+                    swapped = True
+    else:
+        while gap != 1 or swapped is not False:
+            gap = max(1, int(gap // 1.3))
+            swapped = False
+            for i in range(n - gap):
+                ridx = i + gap
+                if (left := arr[i]) < (right := arr[ridx]):
+                    arr[i], arr[ridx] = right, left
+                    swapped = True
+
+
+def bubble_sort(arr: list, reverse: bool = False):
+    upper = len(arr) - 1
+    for i in range(0, upper):
+        for k in range(0, upper - i):
+            ridx = k + 1
+            if (left := arr[k]) > (right := arr[ridx]):
+                arr[k], arr[ridx] = right, left
