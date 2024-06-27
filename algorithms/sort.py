@@ -29,13 +29,13 @@ def bubble_sort(arr: list, reverse: bool = False) -> None:
 def comb_sort(arr: list, reverse: bool = False) -> None:
     n = gap = len(arr)
     swapped = True
-    if not reverse:
+    if reverse:
         while gap != 1 or swapped is not False:
             gap = max(1, int(gap // 1.3))
             swapped = False
             for i in range(n - gap):
                 right_idx = i + gap
-                if (left := arr[i]) > (right := arr[right_idx]):
+                if (left := arr[i]) < (right := arr[right_idx]):
                     arr[i], arr[right_idx] = right, left
                     swapped = True
     else:
@@ -44,7 +44,7 @@ def comb_sort(arr: list, reverse: bool = False) -> None:
             swapped = False
             for i in range(n - gap):
                 right_idx = i + gap
-                if (left := arr[i]) < (right := arr[right_idx]):
+                if (left := arr[i]) > (right := arr[right_idx]):
                     arr[i], arr[right_idx] = right, left
                     swapped = True
 
@@ -240,17 +240,12 @@ def _quick_sort(arr: list, low: int, high: int, reverse: bool = False):
 
                     arr[k] = temp
         else:
-            # After testing, this appears to be the best way to select the
-            # pivot.
-            if high - low <= 54:
-                pivot = random.randint(low, high)
-            else:
-                pivot = (high + low) // 2
-                if arr[low] < arr[high]:
-                    if arr[high] < arr[pivot]:
-                        pivot = high
-                elif arr[low] < arr[pivot]:
-                    pivot = low
+            pivot = (high + low) // 2
+            if arr[low] < arr[high]:
+                if arr[high] < arr[pivot]:
+                    pivot = high
+            elif arr[low] < arr[pivot]:
+                pivot = low
 
             pivot_value = arr[pivot]
             arr[pivot], arr[low] = arr[low], arr[pivot]
@@ -272,10 +267,10 @@ def _quick_sort(arr: list, low: int, high: int, reverse: bool = False):
 
 
 def heap_sort(arr: list, reverse: bool = False):
-    if not reverse:
-        heap = structs.MaxHeap(arr)
-    else:
+    if reverse:
         heap = structs.MinHeap(arr)
+    else:
+        heap = structs.MaxHeap(arr)
 
     values = heap._items
     for upper in range(len(values) - 1, 0, -1):
