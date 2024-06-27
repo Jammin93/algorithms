@@ -143,26 +143,28 @@ class MaxHeap(_Heap):
             parent = (index - 1) // 2
 
     def _sift_down(self, index: int, upper: Optional[int] = None) -> None:
-        if upper is None:
-            upper = len(self._items) - 1
-
         items = self._items
+        if upper is None:
+            upper = len(items) - 1
+
         while True:
             left = index * 2 + 1
             right = index * 2 + 2
-            # Determine whether we have two children.
+            # Determine whether our upper value has two children.
             if right <= upper:
                 if items[left] >= items[right]:
                     mx = left
                 else:
                     mx = right
 
+                # Don't swap unless the value at `index` is strictly smaller
+                # than the rightmost child.
                 if items[index] >= items[mx]:
                     break
 
                 items[index], items[mx] = items[mx], items[index]
                 index = mx
-            # If we don't have two children, check to see if we have one child.
+            # If we don't have two children, check to see if we have one.
             elif left <= upper:
                 if items[index] >= items[left]:
                     break
@@ -179,6 +181,63 @@ class MinHeap(MaxHeap):
     def __init__(self, values: Optional[list] = None):
         super().__init__(values)
 
+    @property
+    def smallest(self):
+        return self._items[0]
+
+    def nth_smallest(self, n: int, allow_dupes: bool = False):
+        if n > len(self._items):
+            return None
+
+        if n == 1:
+            return self._items[0]
+
+        if allow_dupes:
+            if n <= 50_000:
+                keep = []
+                value = self.pop()
+                keep.append(value)
+                for _ in range(1, n):
+                    value = self.pop()
+                    keep.append(value)
+
+                for v in keep:
+                    self.push(v)
+            else:
+                lst = sorted(self._items)
+                value = lst[n - 1]
+        else:
+            if n <= 50_000:
+                k = 1
+                i = 0
+                value = self._items[0]
+                keep = []
+                while k < n:
+                    if i > len(self._items) - 1:
+                        return None
+
+                    v = self.pop()
+                    if v < value:
+                        value = v
+                        k += 1
+
+                    keep.append(v)
+                    i += 1
+
+                for v in keep:
+                    self.push(v)
+
+                return value
+            else:
+                lst = list(set(self._items))
+                if n > len(lst):
+                    return None
+
+                lst.sort()
+                value = lst[n - 1]
+
+        return value
+
     def _sift_up(self, index: int) -> None:
         parent = (index - 1) // 2
         items = self._items
@@ -188,14 +247,14 @@ class MinHeap(MaxHeap):
             parent = (index - 1) // 2
 
     def _sift_down(self, index: int, upper: Optional[int] = None) -> None:
-        if upper is None:
-            upper = len(self._items) - 1
-
         items = self._items
+        if upper is None:
+            upper = len(items) - 1
+
         while True:
             left = index * 2 + 1
             right = index * 2 + 2
-            # Determine whether we have two children.
+            # Determine whether our upper value has two children.
             if right <= upper:
                 if items[left] <= items[right]:
                     mn = left
@@ -205,9 +264,11 @@ class MinHeap(MaxHeap):
                 if items[index] <= items[mn]:
                     break
 
+                # Don't swap unless the value at `index` is strictly smaller
+                # than the rightmost child.
                 items[index], items[mn] = items[mn], items[index]
                 index = mn
-            # If we don't have two children, check to see if we have one child.
+            # If we don't have two children, check to see if we have one.
             elif left <= upper:
                 if items[index] <= items[left]:
                     break
