@@ -3,7 +3,7 @@ import random
 import algorithms.structures as structs
 
 # todo: add thin wrappers to allow non-inplace sorting.
-# todo: add shell sort and possible replace insertion sort logic in quick
+# todo: add shell sort and possibly replace insertion sort logic in quick
 #  sort and merge sort with shell sort. This needs to be tested but should
 #  may be more efficient. It's unclear whether it will be more efficient for
 #  small lists like those encountered in merge and quick sort.
@@ -54,6 +54,29 @@ def insertion_sort(
                     break
 
             arr[swap_idx + 1] = current
+
+
+def comb_sort(arr: list, reverse: bool = False):
+    n = gap = len(arr)
+    swapped = True
+    if not reverse:
+        while gap != 1 or swapped is not False:
+            gap = max(1, int(gap // 1.3))
+            swapped = False
+            for i in range(n - gap):
+                ridx = i + gap
+                if (left := arr[i]) > (right := arr[ridx]):
+                    arr[i], arr[ridx] = right, left
+                    swapped = True
+    else:
+        while gap != 1 or swapped is not False:
+            gap = max(1, int(gap // 1.3))
+            swapped = False
+            for i in range(n - gap):
+                ridx = i + gap
+                if (left := arr[i]) < (right := arr[ridx]):
+                    arr[i], arr[ridx] = right, left
+                    swapped = True
 
 
 def select_sort(
@@ -245,29 +268,6 @@ def heap_sort(arr: list, reverse: bool = False):
     for upper in range(len(heap) - 1, 0, -1):
         values[0], values[upper] = values[upper], values[0]
         heap._sift_down(0, upper - 1)
-
-
-def comb_sort(arr: list, reverse: bool = False):
-    n = gap = len(arr)
-    swapped = True
-    if not reverse:
-        while gap != 1 or swapped is not False:
-            gap = max(1, int(gap // 1.3))
-            swapped = False
-            for i in range(n - gap):
-                ridx = i + gap
-                if (left := arr[i]) > (right := arr[ridx]):
-                    arr[i], arr[ridx] = right, left
-                    swapped = True
-    else:
-        while gap != 1 or swapped is not False:
-            gap = max(1, int(gap // 1.3))
-            swapped = False
-            for i in range(n - gap):
-                ridx = i + gap
-                if (left := arr[i]) < (right := arr[ridx]):
-                    arr[i], arr[ridx] = right, left
-                    swapped = True
 
 
 def bubble_sort(arr: list, reverse: bool = False):

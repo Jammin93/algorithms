@@ -1,10 +1,8 @@
-import algorithms.sort as srt
-
 from abc import ABCMeta, abstractmethod
-from math import log2
 from typing import Optional
 
 # todo: merge code for both MinHeap and MaxHeap into Heap.
+
 
 class _Heap(metaclass=ABCMeta):
 
