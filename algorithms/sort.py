@@ -5,6 +5,8 @@ import algorithms.structures as structs
 from functools import lru_cache
 from typing import Optional
 
+# todo: add docstrings and documentation.
+
 CIURA_SEQUENCE = (4, 10, 23, 57, 132, 301, 701, 1750)
 
 
