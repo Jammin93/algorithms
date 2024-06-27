@@ -2,61 +2,29 @@ import random
 
 import algorithms.structures as structs
 
-# todo: add thin wrappers to allow non-inplace sorting.
-# todo: add shell sort and possibly replace insertion sort logic in quick
-#  sort and merge sort with shell sort. This needs to be tested but should
-#  may be more efficient. It's unclear whether it will be more efficient for
-#  small lists like those encountered in merge and quick sort.
+from functools import lru_cache
+from typing import Optional
+
+CIURA_SEQUENCE = (4, 10, 23, 57, 132, 301, 701, 1750)
 
 
-def insertion_sort(
-        arr: list,
-        reverse: bool = False,
-        ) -> list | None:
-    """
-    Optimized insertion sort which operates in O(n^2) time. Only one swap is
-    performed per iteration of the outer loop. Until the inner loop exits,
-    values are merely pushed up or down the list, overwriting the values of
-    immediate neighbors. The target value from the outer loop is then
-    inserted once the inner loop exits, constituting a swap. Consider the
-    array [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]. Let `i` start at 5
-    and set `k` equal `i` - 1 at the start of the inner loop. The array
-    will be manipulated as follows.
-
-    [10, 9, 8, 7, 6, 6, 4, 3, 2, 1]  --->  `k` = 4
-    [10, 9, 8, 7, 7, 6, 4, 3, 2, 1]  --->  `k` = 3
-    [10, 9, 8, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = 2
-    [10, 9, 9, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = 1
-    [10, 10, 9, 8, 7, 6, 4, 3, 2, 1] --->  `k` = 0
-    [5, 10, 9, 8, 7, 6, 4, 3, 2, 1]  --->  `k` = -1
-    """
-    if not reverse:
-        for i in range(1, len(arr)):
-            current = arr[i]
-            swap_idx = i - 1
-            for k in range(i - 1, -2, -1):
-                swap_idx = k
-                if arr[k] > current:
-                    arr[k + 1] = arr[k]
-                else:
-                    break
-
-            arr[swap_idx + 1] = current
+def bubble_sort(arr: list, reverse: bool = False) -> None:
+    upper = len(arr) - 1
+    if reverse:
+        for i in range(0, upper):
+            for k in range(0, upper - i):
+                right_idx = k + 1
+                if (left := arr[k]) < (right := arr[right_idx]):
+                    arr[k], arr[right_idx] = right, left
     else:
-        for i in range(1, len(arr)):
-            current = arr[i]
-            swap_idx = i - 1
-            for k in range(i - 1, -2, -1):
-                swap_idx = k
-                if arr[k] < current:
-                    arr[k + 1] = arr[k]
-                else:
-                    break
-
-            arr[swap_idx + 1] = current
+        for i in range(0, upper):
+            for k in range(0, upper - i):
+                right_idx = k + 1
+                if (left := arr[k]) > (right := arr[right_idx]):
+                    arr[k], arr[right_idx] = right, left
 
 
-def comb_sort(arr: list, reverse: bool = False):
+def comb_sort(arr: list, reverse: bool = False) -> None:
     n = gap = len(arr)
     swapped = True
     if not reverse:
@@ -64,19 +32,94 @@ def comb_sort(arr: list, reverse: bool = False):
             gap = max(1, int(gap // 1.3))
             swapped = False
             for i in range(n - gap):
-                ridx = i + gap
-                if (left := arr[i]) > (right := arr[ridx]):
-                    arr[i], arr[ridx] = right, left
+                right_idx = i + gap
+                if (left := arr[i]) > (right := arr[right_idx]):
+                    arr[i], arr[right_idx] = right, left
                     swapped = True
     else:
         while gap != 1 or swapped is not False:
             gap = max(1, int(gap // 1.3))
             swapped = False
             for i in range(n - gap):
-                ridx = i + gap
-                if (left := arr[i]) < (right := arr[ridx]):
-                    arr[i], arr[ridx] = right, left
+                right_idx = i + gap
+                if (left := arr[i]) < (right := arr[right_idx]):
+                    arr[i], arr[right_idx] = right, left
                     swapped = True
+
+
+def insertion_sort(
+        arr: list,
+        reverse: bool = False,
+        ) -> None:
+    if reverse:
+        for i in range(1, len(arr)):
+            temp = arr[i]
+            k = i
+            while k >= 1 and (v := arr[k - 1]) < temp:
+                arr[k] = v
+                k -= 1
+
+            arr[k] = temp
+    else:
+        for i in range(1, len(arr)):
+            temp = arr[i]
+            k = i
+            while k >= 1 and (v := arr[k - 1]) > temp:
+                arr[k] = v
+                k -= 1
+
+            arr[k] = temp
+
+
+def shell_sort(arr: list, reverse: bool = False) -> None:
+    _shell_sort(arr, reverse=reverse)
+
+
+def _shell_sort(
+        arr: list,
+        reverse: bool = False,
+        ) -> None:
+    n = len(arr)
+    gaps = [k for k in _generate_shell_gap_sequence(n)][::-1]
+    if reverse:
+        for gap in gaps:
+            for i in range(gap, n):
+                temp = arr[i]
+                k = i
+                while k >= gap and (v := arr[k - gap]) < temp:
+                    arr[k] = v
+                    k -= gap
+
+                arr[k] = temp
+    else:
+        for gap in gaps:
+            for i in range(gap, n):
+                temp = arr[i]
+                k = i
+                while k >= gap and (v := arr[k - gap]) > temp:
+                    arr[k] = v
+                    k -= gap
+
+                arr[k] = temp
+
+
+def _generate_shell_gap_sequence(n: int) -> list[int]:
+    """Generate shell sort gaps using Ciura255Odd."""
+    seq = CIURA_SEQUENCE
+    gap = 1
+    yield gap
+    for gap in seq:
+        if gap >= n:
+            break
+
+        yield gap
+    else:
+        while True:
+            gap = int(gap * 2.25) | 1
+            if gap >= n:
+                break
+
+            yield gap
 
 
 def select_sort(
@@ -106,38 +149,14 @@ def select_sort(
 def merge_sort(arr: list, reverse: bool = False):
     """
     Optimized top-down merge sort which operates in O(nlogn) time. Uses
-    optimized insertion sort for smaller lists in order to minimize pages
-    being swapped in and out of the memory cache.
+    insertion sort for smaller lists in order to minimize the number of times
+    pages are swapped in and out of memory.
     """
     if len(arr) <= 1:
         return arr
     elif len(arr) <= 16:
         # Use insertion sort for small lists, to maximize cache hits.
-        if not reverse:
-            for i in range(1, len(arr)):
-                current = arr[i]
-                swap_idx = i - 1
-                for k in range(swap_idx, -2, -1):
-                    swap_idx = k
-                    if arr[k] > current:
-                        arr[k + 1] = arr[k]
-                    else:
-                        break
-
-                arr[swap_idx + 1] = current
-        else:
-            for i in range(1, len(arr)):
-                current = arr[i]
-                swap_idx = i - 1
-                for k in range(swap_idx, -2, -1):
-                    swap_idx = k
-                    if arr[k] < current:
-                        arr[k + 1] = arr[k]
-                    else:
-                        break
-
-                arr[swap_idx + 1] = current
-
+        insertion_sort(arr, reverse=reverse)
         return arr
     else:
         mid = len(arr) // 2
@@ -200,32 +219,24 @@ def quick_sort(arr: list, reverse: bool = False):
 def _quick_sort(arr: list, low: int, high: int, reverse: bool = False):
     if low < high:
         if high - low <= 10:
-            if not reverse:
-                # Modified insertion sort which maximizes cache hits and
-                # operates closer to O(n) for smaller lists.
+            if reverse:
                 for i in range(low + 1, high + 1):
-                    current = arr[i]
-                    swap_idx = i - 1
-                    for k in range(swap_idx, -2, -1):
-                        swap_idx = k
-                        if arr[k] > current:
-                            arr[k + 1] = arr[k]
-                        else:
-                            break
+                    temp = arr[i]
+                    k = i
+                    while k >= 1 and (v := arr[k - 1]) < temp:
+                        arr[k] = v
+                        k -= 1
 
-                    arr[swap_idx + 1] = current
+                    arr[k] = temp
             else:
                 for i in range(low + 1, high + 1):
-                    current = arr[i]
-                    swap_idx = i - 1
-                    for k in range(swap_idx, -2, -1):
-                        swap_idx = k
-                        if arr[k] < current:
-                            arr[k + 1] = arr[k]
-                        else:
-                            break
+                    temp = arr[i]
+                    k = i
+                    while k >= 1 and (v := arr[k - 1]) > temp:
+                        arr[k] = v
+                        k -= 1
 
-                    arr[swap_idx + 1] = current
+                    arr[k] = temp
         else:
             # After testing, this appears to be the best way to select the
             # pivot.
@@ -268,12 +279,3 @@ def heap_sort(arr: list, reverse: bool = False):
     for upper in range(len(heap) - 1, 0, -1):
         values[0], values[upper] = values[upper], values[0]
         heap._sift_down(0, upper - 1)
-
-
-def bubble_sort(arr: list, reverse: bool = False):
-    upper = len(arr) - 1
-    for i in range(0, upper):
-        for k in range(0, upper - i):
-            ridx = k + 1
-            if (left := arr[k]) > (right := arr[ridx]):
-                arr[k], arr[ridx] = right, left
