@@ -150,7 +150,7 @@ def select_sort(
 
 def merge_sort(arr: list, reverse: bool = False):
     """
-    Optimized top-down merge sort which operates in O(nlogn) time. Uses
+    Optimized, top-down merge sort which operates in O(nlogn) time. Uses
     insertion sort for smaller lists in order to minimize the number of times
     pages are swapped in and out of memory.
     """
@@ -278,6 +278,6 @@ def heap_sort(arr: list, reverse: bool = False):
         heap = structs.MinHeap(arr)
 
     values = heap._items
-    for upper in range(len(heap) - 1, 0, -1):
+    for upper in range(len(values) - 1, 0, -1):
         values[0], values[upper] = values[upper], values[0]
         heap._sift_down(0, upper - 1)
